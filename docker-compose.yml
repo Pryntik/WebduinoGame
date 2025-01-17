@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  web:
+    build:
+      context: ./Web
+      dockerfile: Dockerfile.web
+    ports:
+      - '5173:5173'
+    volumes:
+      - ./Web:/app
+  arduino:
+    build:
+      context: ./Arduino
+      dockerfile: Dockerfile.arduino

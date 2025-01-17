@@ -1,0 +1,6 @@
+FROM ubuntu:22.04
+RUN apt-get update && apt-get install -y arduino-mk arduino
+WORKDIR /arduino
+COPY . .
+# Commande de build Arduino (adapter si nécessaire)
+CMD ["arduino", "--verify", "./Main.ino"]
