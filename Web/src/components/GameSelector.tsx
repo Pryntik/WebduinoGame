@@ -14,7 +14,7 @@ const GameSelector = ({numGame}: GameSelectorType) => {
         }
     }
     return (
-        <div className="gameSelector">
+        <div className="game-selector">
             {selectGame(numGame)}
         </div>
     );
