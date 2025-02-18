@@ -13,7 +13,7 @@ const Game1 = () => {
     const [wordSelected, setWordSelected] = useState<string>('');
     const [victoryStatus, setVictoryStatus] = useState<VictoryStatus>("En cours");
     const [score, setScore] = useState<number>(0);
-    const intervalRef = useRef<number>();
+    const intervalRef = useRef<number>(undefined);
 
     function levelToTime(level?: LevelType) {
         switch (level) {
