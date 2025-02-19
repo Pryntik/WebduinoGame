@@ -2,11 +2,17 @@ import '../styles/Games.css';
 import '../styles/Game1.css';
 import crownImage from '../assets/crown.png';
 import LevelSelector from '../components/LevelSelector';
+import GameHeader from '../components/GameHeader';
+import GameFooter from '../components/GameFooter';
 import { lettersInOrder, lettersNotInOrder, randomWords } from '../data/data';
 import { useEffect, useRef, useState } from 'react';
 import { VictoryStatus } from '../types/Type';
 
-const Game1 = () => {
+type Game1Type = {
+    gameTitle: string,
+}
+
+const Game1 = ({gameTitle}: Game1Type) => {
     const [levelActive, setLevelActive] = useState<string>("easy");
     const [letters, setLetters] = useState<string>(lettersInOrder);
     const [randomWord, setRandomWord] = useState<string>(getRandomWord());
@@ -90,7 +96,7 @@ const Game1 = () => {
             setWordSelected((prevWord) => prevWord + letterAtClick);
 
             intervalRef.current = window.setInterval(() => {
-            setCurrentIndexLetter((prevIndex) => (prevIndex + 1) % letters.length);
+                setCurrentIndexLetter((prevIndex) => (prevIndex + 1) % letters.length);
             }, levelToTime(levelActive));
         }
     }
@@ -123,14 +129,11 @@ const Game1 = () => {
 
     return (
         <div className="game1" onKeyDown={e => e.key === "Space" && clickLetter()}>
-            <div className="game1-header">
-                <div className="game1-header-1">Jeu 1</div>
-                <div className="game1-header-2">{score}</div>
-                <div className="game1-header-3">
-                    {recordScore}
-                    <img className="record-score-image" src={crownImage} alt="crown"/>
-                </div>
-            </div>
+            <GameHeader numGame={1} contents={[
+                gameTitle,
+                score,
+                <>{recordScore}<img className="record-score-image" src={crownImage} alt="crown"/></>
+            ]}/>
             <LevelSelector
                 levels={["easy", "medium", "hard"]}
                 levelActive={level => changeLevel(level)}
@@ -140,8 +143,9 @@ const Game1 = () => {
                 {getBoxLetter(randomWord)}
                 <div className="box-letter-big">
                     <div
+                        key={currentLetter}
                         className="current-letter"
-                        style={{animationName: "slideTopBottom", animationDuration: `${levelToTime(levelActive) / 1000}s`, animationIterationCount: "infinite"}}>
+                        style={{ animation: `slideTopBottom ${levelToTime(levelActive) / 1000}s` }}>
                         {currentLetter}
                     </div>
                 </div>
@@ -150,25 +154,25 @@ const Game1 = () => {
                     <p style={{color: victoryStatus === "Victoire" ? "gold" : "blueviolet"}}>{victoryStatus}</p>
                 )}
             </div>
-            <div className="game1-footer">
+            <GameFooter numGame={1} divDefault={false} contents={[
                 <button
-                    className="button-click-letter"
+                    className="button-click-footer game1-footer-0"
                     onClick={clickLetter}
                     onKeyDown={e => e.key === "Space" && clickLetter()}
                     autoFocus>
-                        Valider
-                </button>
+                    Valider
+                </button>,
                 <button
-                    className="button-click-save"
+                    className="button-click-footer game1-footer-1"
+                    onClick={clickSave}
+                    disabled={score <= recordScore}
                     style={{
                         backgroundColor: score <= recordScore ? "grey" : "paleturquoise",
                         cursor: score <= recordScore ? "not-allowed" : "pointer"
-                    }}
-                    onClick={clickSave}
-                    disabled={score <= recordScore}>
-                        Sauvegarder
+                    }}>
+                    Sauvegarder
                 </button>
-            </div>
+            ]}/>
         </div>
     );
 }

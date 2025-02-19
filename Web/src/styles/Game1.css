@@ -15,7 +15,7 @@
     font-weight: bold;
 }
 
-.game1-header-1 {
+.game1-header-0 {
     width: 50%;
     height: 100%;
     padding-left: 10px;
@@ -24,7 +24,7 @@
     align-items: center;
 }
 
-.game1-header-2 {
+.game1-header-1 {
     width: 25%;
     height: 100%;
     text-align: end;
@@ -35,7 +35,7 @@
     justify-content: flex-end;
 }
 
-.game1-header-3 {
+.game1-header-2 {
     width: 25%;
     height: 100%;
     text-align: end;
@@ -123,29 +123,26 @@
     align-items: center;
 }
 
-.button-click-letter {
+.button-click-footer {
     width: 20%;
     min-width: min-content;
     height: 50px;
     font-size: 20px;
     font-weight: bold;
-    background-color: palegreen;
     color: var(--dark-2);
     margin: 10px;
     border: none;
     border-radius: 10px;
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.button-click-save {
-    width: 20%;
-    min-width: min-content;
-    height: 50px;
-    font-size: 20px;
-    font-weight: bold;
-    color: var(--dark-2);
-    margin: 10px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
+.game1-footer-0 {
+    background-color: palegreen;
+}
+
+.game1-footer-1 {
+    background-color: paleturquoise;
 }

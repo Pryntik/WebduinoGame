@@ -1,3 +1,4 @@
+import '../styles/AllGames.css';
 import { useEffect, useState } from "react";
 
 type GameSelectorType<LevelType extends string> = {
@@ -21,7 +22,7 @@ function LevelSelector<LevelType extends string>({levels, levelActive, levelName
                     key={index}
                     className={`button-level button-${lvl} ${level === lvl ? "button-level-active" : ""}`}
                     onClick={() => setLevel(lvl)}>
-                    {levelNames && levelNames[index] ? levelNames[index] : lvl}
+                    {levelNames && levelNames[index] && levelNames.length === levels.length ? levelNames[index] : lvl}
                 </button>
             ))}
         </div>
