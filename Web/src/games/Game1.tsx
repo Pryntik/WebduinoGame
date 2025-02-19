@@ -1,12 +1,13 @@
 import '../styles/Games.css';
 import '../styles/Game1.css';
 import crownImage from '../assets/crown.png';
+import LevelSelector from '../components/LevelSelector';
 import { lettersInOrder, lettersNotInOrder, randomWords } from '../data/data';
 import { useEffect, useRef, useState } from 'react';
-import { LevelType, VictoryStatus } from '../types/Type';
+import { VictoryStatus } from '../types/Type';
 
 const Game1 = () => {
-    const [levelActive, setLevelActive] = useState<LevelType>("easy");
+    const [levelActive, setLevelActive] = useState<string>("easy");
     const [letters, setLetters] = useState<string>(lettersInOrder);
     const [randomWord, setRandomWord] = useState<string>(getRandomWord());
     const [currentLetter, setCurrentLetter] = useState<string>(letters[0]);
@@ -15,11 +16,9 @@ const Game1 = () => {
     const [victoryStatus, setVictoryStatus] = useState<VictoryStatus>("En cours");
     const [score, setScore] = useState<number>(0);
     const [recordScore, setRecordScore] = useState<number>(Number(localStorage.getItem("record_score-game1")) || 0);
-    const [animationName, setAnimationName] = useState<string>("");
-    const [animationDuration, setAnimationDuration] = useState<number>(levelToAnimationDuration(levelActive));
     const intervalRef = useRef<number>(undefined);
 
-    function levelToTime(level?: LevelType) {
+    function levelToTime(level?: string) {
         switch (level) {
             case "easy": return 1000;
             case "medium": return 800;
@@ -28,16 +27,7 @@ const Game1 = () => {
         }
     }
 
-    function levelToAnimationDuration(level?: LevelType) {
-        switch (level) {
-            case "easy": return 1;
-            case "medium": return 2;
-            case "hard": return 1;
-            default: return 3;
-        }
-    }
-
-    function changeLevel(level: LevelType) {
+    function changeLevel(level: string) {
         setLevelActive(level);
         if (level === "easy") setLetters(lettersInOrder);
         else setLetters(lettersNotInOrder);
@@ -118,17 +108,6 @@ const Game1 = () => {
     }, []);
 
     useEffect(() => {
-        setAnimationDuration(levelToAnimationDuration(levelActive));
-    }, [levelActive]);
-
-    useEffect(() => {
-        setAnimationName("slideTopMiddle");
-        setTimeout(() => {
-            setAnimationName("slideMiddleBottom");
-        }, levelToTime(levelActive) * 0.8);
-    }, [currentLetter]);
-
-    useEffect(() => {
         if (wordSelected.length > 0) {
             calcScore(wordSelected);
         }
@@ -152,31 +131,19 @@ const Game1 = () => {
                     <img className="record-score-image" src={crownImage} alt="crown"/>
                 </div>
             </div>
-            <div className="level-zone">
-                <button
-                    className={`button-level button-easy ${levelActive === "easy" ? "button-level-active" : ""}`}
-                    onClick={() => changeLevel("easy")}>
-                    Facile
-                </button>
-                <button
-                    className={`button-level button-medium ${levelActive === "medium" ? "button-level-active" : ""}`}
-                    onClick={() => changeLevel("medium")}>
-                    Moyen
-                </button>
-                <button
-                    className={`button-level button-hard ${levelActive === "hard" ? "button-level-active" : ""}`}
-                    onClick={() => changeLevel("hard")}>
-                    Fort
-                </button>
-            </div>
+            <LevelSelector
+                levels={["easy", "medium", "hard"]}
+                levelActive={level => changeLevel(level)}
+                levelNames={["Facile", "Moyen", "Difficile"]}
+                levelDefault="easy"/>
             <div className="game1-content">
                 {getBoxLetter(randomWord)}
                 <div className="box-letter-big">
-                    <p
+                    <div
                         className="current-letter"
-                        style={{animationName: animationName, animationDuration: `${animationDuration}s`, animationIterationCount: "infinite"}}>
+                        style={{animationName: "slideTopBottom", animationDuration: `${levelToTime(levelActive) / 1000}s`, animationIterationCount: "infinite"}}>
                         {currentLetter}
-                    </p>
+                    </div>
                 </div>
                 {getBoxLetter(wordSelected, randomWord.length)}
                 {victoryStatus !== "En cours" && (
