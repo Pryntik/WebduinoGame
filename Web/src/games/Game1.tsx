@@ -1,5 +1,6 @@
 import '../styles/Games.css';
 import '../styles/Game1.css';
+import crownImage from '../assets/crown.png';
 import { lettersInOrder, lettersNotInOrder, randomWords } from '../data/data';
 import { useEffect, useRef, useState } from 'react';
 import { LevelType, VictoryStatus } from '../types/Type';
@@ -13,14 +14,26 @@ const Game1 = () => {
     const [wordSelected, setWordSelected] = useState<string>('');
     const [victoryStatus, setVictoryStatus] = useState<VictoryStatus>("En cours");
     const [score, setScore] = useState<number>(0);
+    const [recordScore, setRecordScore] = useState<number>(Number(localStorage.getItem("record_score-game1")) || 0);
+    const [animationName, setAnimationName] = useState<string>("");
+    const [animationDuration, setAnimationDuration] = useState<number>(levelToAnimationDuration(levelActive));
     const intervalRef = useRef<number>(undefined);
 
     function levelToTime(level?: LevelType) {
         switch (level) {
-            case "easy": return 500;
-            case "medium": return 500;
-            case "hard": return 300;
-            default: return 500;
+            case "easy": return 1000;
+            case "medium": return 800;
+            case "hard": return 500;
+            default: return 1000;
+        }
+    }
+
+    function levelToAnimationDuration(level?: LevelType) {
+        switch (level) {
+            case "easy": return 1;
+            case "medium": return 2;
+            case "hard": return 1;
+            default: return 3;
         }
     }
 
@@ -40,6 +53,21 @@ const Game1 = () => {
 
     function getRandomWord() {
         return randomWords[Math.floor(Math.random() * randomWords.length)];
+    }
+
+    function getBoxLetter(text: string, textSize?: number) {
+        const splitWord = text.split("");
+        if (textSize && textSize > text.length) {
+            for (let i = 0; i < textSize - text.length; i++)
+                splitWord.push(" ");
+        }
+        return (
+            <div className="split-word">
+                {splitWord.map((letter, index) => (
+                    <div key={index} className="box-letter">{letter}</div>
+                ))}
+            </div>
+        );
     }
 
     function resetAndNextWord() {
@@ -77,9 +105,28 @@ const Game1 = () => {
         }
     }
 
+    function clickSave() {
+        if (score > recordScore) {
+            localStorage.setItem("record_score-game1", score.toString());
+            setScore(0);
+            setRecordScore(Number(localStorage.getItem("record_score-game1")) || 0);
+        }
+    }
+
     useEffect(() => {
         setRandomWord(getRandomWord());
     }, []);
+
+    useEffect(() => {
+        setAnimationDuration(levelToAnimationDuration(levelActive));
+    }, [levelActive]);
+
+    useEffect(() => {
+        setAnimationName("slideTopMiddle");
+        setTimeout(() => {
+            setAnimationName("slideMiddleBottom");
+        }, levelToTime(levelActive) * 0.8);
+    }, [currentLetter]);
 
     useEffect(() => {
         if (wordSelected.length > 0) {
@@ -96,9 +143,14 @@ const Game1 = () => {
     }, [currentIndexLetter, letters, levelActive]);
 
     return (
-        <div className="game1">
+        <div className="game1" onKeyDown={e => e.key === "Space" && clickLetter()}>
             <div className="game1-header">
-                Jeu 1
+                <div className="game1-header-1">Jeu 1</div>
+                <div className="game1-header-2">{score}</div>
+                <div className="game1-header-3">
+                    {recordScore}
+                    <img className="record-score-image" src={crownImage} alt="crown"/>
+                </div>
             </div>
             <div className="level-zone">
                 <button
@@ -118,20 +170,37 @@ const Game1 = () => {
                 </button>
             </div>
             <div className="game1-content">
-                <div className="game1-info-zone">
-                    <p className="game1-score">Score: {score}</p>
+                {getBoxLetter(randomWord)}
+                <div className="box-letter-big">
+                    <p
+                        className="current-letter"
+                        style={{animationName: animationName, animationDuration: `${animationDuration}s`, animationIterationCount: "infinite"}}>
+                        {currentLetter}
+                    </p>
                 </div>
-                <p className="random-word">{randomWord}</p>
-                <p className="current-letter">{currentLetter}</p>
-                <p className="word-selected">{wordSelected}</p>
+                {getBoxLetter(wordSelected, randomWord.length)}
+                {victoryStatus !== "En cours" && (
+                    <p style={{color: victoryStatus === "Victoire" ? "gold" : "blueviolet"}}>{victoryStatus}</p>
+                )}
+            </div>
+            <div className="game1-footer">
                 <button
                     className="button-click-letter"
                     onClick={clickLetter}
-                    onKeyUp={e => e.key === "Enter" && clickLetter()}
+                    onKeyDown={e => e.key === "Space" && clickLetter()}
                     autoFocus>
-                        Ok
+                        Valider
                 </button>
-                <p className="letters">{victoryStatus === "En cours" ? "" : victoryStatus}</p>
+                <button
+                    className="button-click-save"
+                    style={{
+                        backgroundColor: score <= recordScore ? "grey" : "paleturquoise",
+                        cursor: score <= recordScore ? "not-allowed" : "pointer"
+                    }}
+                    onClick={clickSave}
+                    disabled={score <= recordScore}>
+                        Sauvegarder
+                </button>
             </div>
         </div>
     );

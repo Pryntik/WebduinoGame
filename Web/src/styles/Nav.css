@@ -5,7 +5,7 @@
     flex-direction: column;
     align-items: center;
     flex-wrap: wrap;
-    background-color: #1a1a1a;
+    background-color: var(--dark-1);
 }
 
 .navGame_button {
@@ -14,7 +14,7 @@
     margin-top: 5%;
     font: 24px 'Arial';
     font-weight: bold;
-    color: #1a1a1a;
+    color: var(--dark);
     background-color: skyblue;
     border: none;
     cursor: pointer;
