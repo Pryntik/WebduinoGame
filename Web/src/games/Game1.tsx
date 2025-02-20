@@ -26,6 +26,7 @@ const Game1 = ({gameTitle}: Game1Type) => {
     const [receivedData, setReceivedData] = useState<string>(""); // Nouvel état pour stocker les données reçues
     const serialPortRef = useRef<SerialPort | null>(null);
     const readerRef = useRef<ReadableStreamDefaultReader | null>(null);
+    const writerRef = useRef<WritableStreamDefaultWriter | null>(null);
     const intervalRef = useRef<number>(undefined);
 
     // Function to connect to serial port
@@ -44,6 +45,9 @@ const Game1 = ({gameTitle}: Game1Type) => {
     
             const reader = port.readable.getReader();
             readerRef.current = reader;
+
+            const writer = port.writable.getWriter();
+            writerRef.current = writer;
             
             // Démarrer la lecture des données dans un useEffect
         } catch (error) {
@@ -59,13 +63,34 @@ const Game1 = ({gameTitle}: Game1Type) => {
             readerRef.current.releaseLock();
             readerRef.current = null;
         }
-    
+        if (writerRef.current) {
+            await writerRef.current.close();
+            writerRef.current.releaseLock();
+            writerRef.current = null;
+        }
+
         if (serialPortRef.current) {
             await serialPortRef.current.close();
             serialPortRef.current = null;
         }
     
         setIsSerialConnected(false);
+    };
+
+    const sendScoreToArduino = async (score: number) => {
+        if (!writerRef.current) {
+            console.warn("Writer non disponible, connexion série requise");
+            return;
+        }
+    
+        try {
+            const encoder = new TextEncoder();
+            const scoreMessage = `SCORE:${score}\n`; // Format du message
+            await writerRef.current.write(encoder.encode(scoreMessage));
+            console.log("Score envoyé :", scoreMessage);
+        } catch (error) {
+            console.error("Erreur lors de l'envoi du score :", error);
+        }
     };
 
     function levelToTime(level?: string) {
@@ -184,6 +209,12 @@ const Game1 = ({gameTitle}: Game1Type) => {
             clickLetter(); // Appel de ta fonction lorsque l'Arduino envoie "A"
         }
     }, [receivedData]); // Se déclenche à chaque changement de `receivedData`
+
+    useEffect(() => {
+        if (isSerialConnected) {
+            sendScoreToArduino(score);
+        }
+    }, [score, isSerialConnected]);
 
     // Cleanup on component unmount
     useEffect(() => {

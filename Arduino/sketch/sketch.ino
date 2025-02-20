@@ -1,4 +1,5 @@
 #include "SevSeg.h"
+
 SevSeg sevseg;
 
 // Variables globales
@@ -45,14 +46,38 @@ void setup() {
 }
 
 void loop() {
+  // Lire les données série et mettre à jour le score
+  if (Serial.available()) {
+    String receivedData = Serial.readStringUntil('\n'); // Lire jusqu'à la fin de ligne
+
+    if (receivedData.startsWith("SCORE:")) {
+      int newScore = receivedData.substring(6).toInt(); // Extraire le nombre
+      if(Compteur > newScore) {
+        digitalWrite(RED_LED_PIN, HIGH);
+        digitalWrite(GREEN_LED_PIN, LOW);
+      } else if (Compteur < newScore) {
+        digitalWrite(RED_LED_PIN, LOW);
+        digitalWrite(GREEN_LED_PIN, HIGH);
+      }
+      Compteur = newScore; // Mettre à jour le score affiché
+      Serial.print("Score reçu : ");
+      Serial.println(Compteur);
+    }
+  }
+
+  // Lire l'état du bouton
   bool buttonState = digitalRead(BUTTON_PIN);
 
   if (buttonState == LOW && lastButtonState == HIGH) {
     if (millis() - lastDebounceTime > debounceDelay) {
-      Serial.println("A");  // Envoie "CLICK" via le port Série
+      Serial.println("A");  // Envoie "A" via le port Série
       lastDebounceTime = millis();
     }
   }
 
   lastButtonState = buttonState;
+
+  // Mettre à jour l'affichage 7 segments avec la nouvelle valeur
+  sevseg.setNumber(Compteur);
+  sevseg.refreshDisplay();
 }
