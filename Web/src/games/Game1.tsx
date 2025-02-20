@@ -22,7 +22,76 @@ const Game1 = ({gameTitle}: Game1Type) => {
     const [victoryStatus, setVictoryStatus] = useState<VictoryStatus>("En cours");
     const [score, setScore] = useState<number>(0);
     const [recordScore, setRecordScore] = useState<number>(Number(localStorage.getItem("record_score-game1")) || 0);
+    const [isSerialConnected, setIsSerialConnected] = useState(false);
+    const [receivedData, setReceivedData] = useState<string>(""); // Nouvel état pour stocker les données reçues
+    const serialPortRef = useRef<SerialPort | null>(null);
+    const readerRef = useRef<ReadableStreamDefaultReader | null>(null);
+    const writerRef = useRef<WritableStreamDefaultWriter | null>(null);
     const intervalRef = useRef<number>(undefined);
+
+    // Function to connect to serial port
+    const connectSerialPort = async () => {
+        if (!('serial' in navigator)) {
+            console.warn('Web Serial API not supported');
+            return;
+        }
+    
+        try {
+            const port = await (navigator as any).serial.requestPort();
+            await port.open({ baudRate: 9600 });
+    
+            serialPortRef.current = port;
+            setIsSerialConnected(true);
+    
+            const reader = port.readable.getReader();
+            readerRef.current = reader;
+
+            const writer = port.writable.getWriter();
+            writerRef.current = writer;
+            
+            // Démarrer la lecture des données dans un useEffect
+        } catch (error) {
+            console.error('Serial communication error:', error);
+            setIsSerialConnected(false);
+        }
+    };
+
+    // Cleanup function for serial connection
+    const disconnectSerialPort = async () => {
+        if (readerRef.current) {
+            await readerRef.current.cancel();
+            readerRef.current.releaseLock();
+            readerRef.current = null;
+        }
+        if (writerRef.current) {
+            await writerRef.current.close();
+            writerRef.current.releaseLock();
+            writerRef.current = null;
+        }
+
+        if (serialPortRef.current) {
+            await serialPortRef.current.close();
+            serialPortRef.current = null;
+        }
+    
+        setIsSerialConnected(false);
+    };
+
+    const sendScoreToArduino = async (score: number) => {
+        if (!writerRef.current) {
+            console.warn("Writer non disponible, connexion série requise");
+            return;
+        }
+    
+        try {
+            const encoder = new TextEncoder();
+            const scoreMessage = `SCORE:${score}\n`; // Format du message
+            await writerRef.current.write(encoder.encode(scoreMessage));
+            console.log("Score envoyé :", scoreMessage);
+        } catch (error) {
+            console.error("Erreur lors de l'envoi du score :", error);
+        }
+    };
 
     function levelToTime(level?: string) {
         switch (level) {
@@ -109,6 +178,51 @@ const Game1 = ({gameTitle}: Game1Type) => {
         }
     }
 
+    // Lire les données reçues dans un useEffect
+    useEffect(() => {
+        if (!isSerialConnected || !readerRef.current) return;
+
+        const readData = async () => {
+            const reader = readerRef.current;
+            try {
+                while (true) {
+                    const { value, done } = await (reader as any).read();
+                    if (done) break;
+
+                    const decoder = new TextDecoder();
+                    const data = decoder.decode(value).trim();
+                    console.log("Donnée reçue :", data);
+
+                    setReceivedData(data); // Mettre à jour le state avec la donnée reçue
+                }
+            } catch (error) {
+                console.error("Erreur lors de la lecture des données série :", error);
+            }
+        };
+
+        readData();
+    }, [isSerialConnected]); // Exécute la lecture seulement quand la connexion est active
+
+    // Réagir à la mise à jour des données reçues
+    useEffect(() => {
+        if (receivedData === "A") {
+            clickLetter(); // Appel de ta fonction lorsque l'Arduino envoie "A"
+        }
+    }, [receivedData]); // Se déclenche à chaque changement de `receivedData`
+
+    useEffect(() => {
+        if (isSerialConnected) {
+            sendScoreToArduino(score);
+        }
+    }, [score, isSerialConnected]);
+
+    // Cleanup on component unmount
+    useEffect(() => {
+        return () => {
+            disconnectSerialPort();
+        };
+    }, []);
+
     useEffect(() => {
         setRandomWord(getRandomWord());
     }, []);
@@ -171,7 +285,24 @@ const Game1 = ({gameTitle}: Game1Type) => {
                         cursor: score <= recordScore ? "not-allowed" : "pointer"
                     }}>
                     Sauvegarder
-                </button>
+                </button>,
+                <div className="serial-connection">
+                {!isSerialConnected ? (
+                    <button 
+                        onClick={connectSerialPort}
+                        className="connect-serial-btn"
+                    >
+                        Connect Arduino
+                    </button>
+                ) : (
+                    <button 
+                        onClick={disconnectSerialPort}
+                        className="disconnect-serial-btn"
+                    >
+                        Disconnect Arduino
+                    </button>
+                )}
+                </div>
             ]}/>
         </div>
     );
