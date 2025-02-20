@@ -1,6 +1,12 @@
-FROM ubuntu:22.04
-RUN apt-get update && apt-get install -y arduino-mk arduino
-WORKDIR /arduino
-COPY . .
-# Commande de build Arduino (adapter si nécessaire)
-CMD ["arduino", "--verify", "./Main.ino"]
+FROM ubuntu:latest
+
+RUN apt update && apt install -y curl && \
+    curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh && \
+    arduino-cli core update-index && \
+    arduino-cli core install arduino:avr && \
+    arduino-cli lib install "SevSeg"
+
+WORKDIR /sketch
+COPY sketch /sketch
+
+CMD ["bash", "-c", "ls -la /sketch && arduino-cli compile --fqbn arduino:avr:uno /sketch && arduino-cli upload -p /dev/ttyUSB0 --fqbn arduino:avr:uno /sketch"]

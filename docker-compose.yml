@@ -8,7 +8,14 @@ services:
       - '5173:5173'
     volumes:
       - ./Web:/app
+    devices:
+      - "/dev/ttyUSB0:/dev/ttyUSB0"
+    privileged: true
+
   arduino:
     build:
       context: ./Arduino
       dockerfile: Dockerfile.arduino
+    devices:
+      - "/dev/ttyUSB0:/dev/ttyUSB0"
+    privileged: true
