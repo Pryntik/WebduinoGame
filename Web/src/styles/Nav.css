@@ -1,0 +1,22 @@
+.navGame {
+    width: 20%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-wrap: wrap;
+    background-color: var(--dark-1);
+}
+
+.navGame_button {
+    width: 80%;
+    height: 5%;
+    margin-top: 5%;
+    font: 24px 'Arial';
+    font-weight: bold;
+    color: var(--dark);
+    background-color: skyblue;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+}

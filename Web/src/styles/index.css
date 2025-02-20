@@ -1,0 +1,13 @@
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+button {
+  user-select: none;
+}
+
+:root {
+  --dark-1: #1a1a1a;
+  --dark-2: #242424;
+}
