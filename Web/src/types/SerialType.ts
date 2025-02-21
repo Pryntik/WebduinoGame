@@ -1,21 +1,18 @@
-interface SerialPortRequestOptions {
+export type SerialPortRequestOptions = {
     filters?: { usbVendorId?: number }[];
-}
+};
 
-interface SerialPort {
+export type SerialPort = {
     open(options: { baudRate: number }): Promise<void>;
     close(): Promise<void>;
     readable: ReadableStream;
-}
+    writable: WritableStream;
+};
 
-interface Serial {
+export type Serial = {
     requestPort(options?: SerialPortRequestOptions): Promise<SerialPort>;
-}
+};
 
-interface NavigatorSerial {
+export type NavigatorSerial = {
     serial: Serial;
-}
-
-interface Navigator {
-    serial?: Serial;
-}
+};

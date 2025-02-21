@@ -2,11 +2,11 @@ import '../styles/Games.css';
 import '../styles/Game1.css';
 import crownImage from '../assets/crown.png';
 import LevelSelector from '../components/LevelSelector';
-import GameHeader from '../components/GameHeader';
-import GameFooter from '../components/GameFooter';
+import GameBar from '../components/GameBar';
 import { lettersInOrder, lettersNotInOrder, randomWords } from '../data/data';
 import { useEffect, useRef, useState } from 'react';
 import { VictoryStatus } from '../types/Type';
+import { NavigatorSerial, SerialPort } from '../types/SerialType';
 
 type Game1Type = {
     gameTitle: string,
@@ -23,7 +23,7 @@ const Game1 = ({gameTitle}: Game1Type) => {
     const [score, setScore] = useState<number>(0);
     const [recordScore, setRecordScore] = useState<number>(Number(localStorage.getItem("record_score-game1")) || 0);
     const [isSerialConnected, setIsSerialConnected] = useState(false);
-    const [receivedData, setReceivedData] = useState<string>(""); // Nouvel état pour stocker les données reçues
+    const [receivedData, setReceivedData] = useState<string>("");
     const serialPortRef = useRef<SerialPort | null>(null);
     const readerRef = useRef<ReadableStreamDefaultReader | null>(null);
     const writerRef = useRef<WritableStreamDefaultWriter | null>(null);
@@ -37,7 +37,7 @@ const Game1 = ({gameTitle}: Game1Type) => {
         }
     
         try {
-            const port = await (navigator as any).serial.requestPort();
+            const port = await (navigator as NavigatorSerial).serial.requestPort();
             await port.open({ baudRate: 9600 });
     
             serialPortRef.current = port;
@@ -48,9 +48,8 @@ const Game1 = ({gameTitle}: Game1Type) => {
 
             const writer = port.writable.getWriter();
             writerRef.current = writer;
-            
-            // Démarrer la lecture des données dans un useEffect
-        } catch (error) {
+        }
+        catch (error) {
             console.error('Serial communication error:', error);
             setIsSerialConnected(false);
         }
@@ -183,17 +182,20 @@ const Game1 = ({gameTitle}: Game1Type) => {
         if (!isSerialConnected || !readerRef.current) return;
 
         const readData = async () => {
+            if (!readerRef.current) return;
+
             const reader = readerRef.current;
             try {
                 while (true) {
-                    const { value, done } = await (reader as any).read();
+                    const { value, done } = await reader.read();
                     if (done) break;
 
                     const decoder = new TextDecoder();
                     const data = decoder.decode(value).trim();
                     console.log("Donnée reçue :", data);
 
-                    setReceivedData(data); // Mettre à jour le state avec la donnée reçue
+                    // Mettre à jour le state avec la donnée reçue
+                    setReceivedData(data);
                 }
             } catch (error) {
                 console.error("Erreur lors de la lecture des données série :", error);
@@ -201,14 +203,15 @@ const Game1 = ({gameTitle}: Game1Type) => {
         };
 
         readData();
-    }, [isSerialConnected]); // Exécute la lecture seulement quand la connexion est active
+    }, [isSerialConnected]);
 
     // Réagir à la mise à jour des données reçues
     useEffect(() => {
         if (receivedData === "A") {
-            clickLetter(); // Appel de ta fonction lorsque l'Arduino envoie "A"
+            // Appel de ta fonction lorsque l'Arduino envoie "A"
+            clickLetter();
         }
-    }, [receivedData]); // Se déclenche à chaque changement de `receivedData`
+    }, [receivedData]);
 
     useEffect(() => {
         if (isSerialConnected) {
@@ -243,7 +246,7 @@ const Game1 = ({gameTitle}: Game1Type) => {
 
     return (
         <div className="game1" onKeyDown={e => e.key === "Space" && clickLetter()}>
-            <GameHeader numGame={1} contents={[
+            <GameBar barName="header" numGame={1} contents={[
                 gameTitle,
                 score,
                 <>{recordScore}<img className="record-score-image" src={crownImage} alt="crown"/></>
@@ -268,7 +271,7 @@ const Game1 = ({gameTitle}: Game1Type) => {
                     <p style={{color: victoryStatus === "Victoire" ? "gold" : "blueviolet"}}>{victoryStatus}</p>
                 )}
             </div>
-            <GameFooter numGame={1} divDefault={false} contents={[
+            <GameBar barName="footer" numGame={1} divDefault={false} contents={[
                 <button
                     className="button-click-footer game1-footer-0"
                     onClick={clickLetter}
