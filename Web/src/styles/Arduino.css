@@ -1,0 +1,19 @@
+.button-arduino {
+    width: 50px;
+    height: 50px;
+    border-radius: 100%;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    margin-left: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.connect-arduino {
+    background-color: palevioletred;
+}
+
+.disconnect-arduino {
+    background-color: palegreen;
+}

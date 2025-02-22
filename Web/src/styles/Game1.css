@@ -146,30 +146,3 @@
 .game1-footer-1 {
     background-color: paleturquoise;
 }
-
-
-.serial-connection {
-    margin-top: 10px;
-    display: flex;
-    justify-content: center;
-}
-
-.connect-serial-btn, 
-.disconnect-serial-btn {
-    padding: 10px 15px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.disconnect-serial-btn {
-    background-color: #f44336;
-}
-
-.connect-serial-btn:hover,
-.disconnect-serial-btn:hover {
-    opacity: 0.8;
-}

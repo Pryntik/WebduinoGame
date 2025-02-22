@@ -1,7 +1,7 @@
 import '../styles/Nav.css';
 import { useNavigate } from "react-router";
 
-const NavGame = () => {
+const NavBar = () => {
     const navigate = useNavigate();
 
     return (
@@ -16,4 +16,4 @@ const NavGame = () => {
     )
 }
 
-export default NavGame;
+export default NavBar;

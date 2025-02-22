@@ -1,19 +1,19 @@
 import './styles/App.css';
-import NavGame from './components/NavGame';
+import NavBar from './components/NavBar';
 import GameSelector from './components/GameSelector';
+import { GameNumberType } from './types/Type';
 
 type AppType = {
-  numGame: number;
+  numGame: GameNumberType;
 }
 
 const App = ({numGame}: AppType) => {
-
-  return (
+    return (
     <div className="app">
-      <NavGame/>
-      <GameSelector numGame={numGame}/>
+        <NavBar/>
+        <GameSelector numGame={numGame}/>
     </div>
-  )
+    )
 }
 
-export default App
+export default App;

@@ -3,7 +3,7 @@ import Game2 from "../games/Game2";
 import { GameNumberType } from "../types/Type";
 
 type GameSelectorType = {
-    numGame: GameNumberType;
+    numGame: GameNumberType,
 }
 
 const GameSelector = ({numGame}: GameSelectorType) => {
