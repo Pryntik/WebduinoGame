@@ -80,7 +80,6 @@
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    cursor: pointer;
 }
 
 @keyframes slideTopBottom {
@@ -103,7 +102,6 @@
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    cursor: pointer;
 }
 
 .current-letter {

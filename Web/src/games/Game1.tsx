@@ -3,7 +3,7 @@ import '../styles/Game1.css';
 import crownImage from '../assets/crown.png';
 import LevelSelector from '../components/LevelSelector';
 import GameBar from '../components/GameBar';
-import { lettersInOrder, lettersNotInOrder, randomWords } from '../data/data';
+import { lettersInOrder, lettersNotInOrder, wordList } from '../data/data';
 import { useEffect, useRef, useState } from 'react';
 import { VictoryStatus } from '../types/Type';
 import ArduinoConnect from '../components/ArduinoConnect';
@@ -48,7 +48,7 @@ const Game1 = ({gameTitle}: Game1Type) => {
     }
 
     function getRandomWord() {
-        return randomWords[Math.floor(Math.random() * randomWords.length)];
+        return wordList[Math.floor(Math.random() * wordList.length)];
     }
 
     function getBoxLetter(text: string, textSize?: number) {

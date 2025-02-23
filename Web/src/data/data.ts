@@ -1,7 +1,7 @@
 export const lettersInOrder = 'abcdefghijklmnopqrstuvwxyz';
 export const lettersNotInOrder = 'wqblaytxcvzhsmfeukoprnjdgi';
 
-export const randomWords = [
+export const wordList = [
     "ami","arc","air","art","avis","bleu","brin","but","cape","ciel",
     "cire","code","coup","cric","cure","dame","data","dort","dune","eau",
     "face","fait","faim","faux","fille","fils","fleur","fois","fort","fuse",
