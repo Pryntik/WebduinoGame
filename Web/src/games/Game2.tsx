@@ -46,7 +46,7 @@ const Game2 = ({gameTitle}: Game2Type) => {
         const sameWords: string[] = [];
         for (let i = 0; i < nbWord - sameWordLength; i++) {
             let randomIndex = Math.floor(Math.random() * wordList.length);
-            while (sameWords.some(w => w === wordList[randomIndex])) {
+            while (words.some(w => w === wordList[randomIndex])) {
                 randomIndex = Math.floor(Math.random() * wordList.length);
             }
             words.push(wordList[randomIndex]);
