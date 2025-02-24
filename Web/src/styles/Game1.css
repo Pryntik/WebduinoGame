@@ -111,7 +111,8 @@
 }
 
 .victory-status {
-    color: white;
+    font: 32px 'Arial';
+    font-weight: bold !important;
 }
 
 .game1-footer {
