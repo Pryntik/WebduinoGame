@@ -25,6 +25,7 @@ const Game2 = ({gameTitle}: Game2Type) => {
     const [score, setScore] = useState<number>(0);
     const [recordScore, setRecordScore] = useState<number>(Number(localStorage.getItem("record_score-game2")) || 0);
     const intervalRef = useRef<number>(undefined);
+    const buttonValidateRef = useRef<HTMLButtonElement>(null);
     const timeBeforeNextWord = 5000;
 
     function levelConvert(level: string): {time: number, nbWord: number, nbSameWord: number} {
@@ -166,6 +167,9 @@ const Game2 = ({gameTitle}: Game2Type) => {
     }, [randomWords]);
 
     useEffect(() => {
+        if (buttonValidateRef.current) {
+            buttonValidateRef.current.focus();
+        }
         checkVictory();
     }, [currentWord, currentIndexWord, victoryStatus]);
 
@@ -217,9 +221,10 @@ const Game2 = ({gameTitle}: Game2Type) => {
             </div>
             <GameBar barName="footer" numGame={1} divDefault={false} contents={[
                 <button
+                    ref={buttonValidateRef}
                     className="button-click-footer game1-footer-0"
                     onClick={clickValidate}
-                    onKeyDown={e => e.key === "Space" && {}}
+                    onKeyDown={e => e.key === "Space" && clickValidate()}
                     autoFocus>
                     Valider
                 </button>,
@@ -234,7 +239,7 @@ const Game2 = ({gameTitle}: Game2Type) => {
                     Sauvegarder
                 </button>
             ]}/>
-            <ArduinoConnect clickButton={() => {}} arduinoData={{data: score, dataName: "Score"}}/>
+            <ArduinoConnect clickButton={clickValidate} arduinoData={{data: score, dataName: "Score"}}/>
         </div>
     );
 }

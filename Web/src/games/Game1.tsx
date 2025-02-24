@@ -23,6 +23,7 @@ const Game1 = ({gameTitle}: Game1Type) => {
     const [score, setScore] = useState<number>(0);
     const [recordScore, setRecordScore] = useState<number>(Number(localStorage.getItem("record_score-game1")) || 0);
     const intervalRef = useRef<number>(undefined);
+    const buttonValidateRef = useRef<HTMLButtonElement>(null);
     const timeBeforeNextWord = 5000;
 
     function levelToTime(level?: string) {
@@ -121,6 +122,9 @@ const Game1 = ({gameTitle}: Game1Type) => {
     }, [wordSelected]);
 
     useEffect(() => {
+        if (buttonValidateRef.current) {
+            buttonValidateRef.current.focus();
+        }
         intervalRef.current = window.setInterval(() => {
             setCurrentIndexLetter((prevIndex) => (prevIndex + 1) % letters.length);
         }, levelToTime(levelActive));
@@ -129,7 +133,7 @@ const Game1 = ({gameTitle}: Game1Type) => {
     }, [currentIndexLetter, letters, levelActive]);
 
     return (
-        <div className="game1" onKeyDown={e => e.key === "Space" && clickValidate()}>
+        <div className="game1">
             <GameBar barName="header" numGame={1} contents={[
                 gameTitle,
                 score,
@@ -157,6 +161,7 @@ const Game1 = ({gameTitle}: Game1Type) => {
             </div>
             <GameBar barName="footer" numGame={1} divDefault={false} contents={[
                 <button
+                    ref={buttonValidateRef}
                     className="button-click-footer game1-footer-0"
                     onClick={clickValidate}
                     onKeyDown={e => e.key === "Space" && clickValidate()}
