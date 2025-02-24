@@ -11,6 +11,7 @@
 .navGame_button {
     width: 80%;
     height: 5%;
+    min-height: fit-content;
     margin-top: 5%;
     font: 24px 'Arial';
     font-weight: bold;

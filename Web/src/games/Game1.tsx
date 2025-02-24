@@ -3,7 +3,7 @@ import '../styles/Game1.css';
 import crownImage from '../assets/crown.png';
 import LevelSelector from '../components/LevelSelector';
 import GameBar from '../components/GameBar';
-import { lettersInOrder, lettersNotInOrder, randomWords } from '../data/data';
+import { lettersInOrder, lettersNotInOrder, wordList } from '../data/data';
 import { useEffect, useRef, useState } from 'react';
 import { VictoryStatus } from '../types/Type';
 import ArduinoConnect from '../components/ArduinoConnect';
@@ -23,6 +23,8 @@ const Game1 = ({gameTitle}: Game1Type) => {
     const [score, setScore] = useState<number>(0);
     const [recordScore, setRecordScore] = useState<number>(Number(localStorage.getItem("record_score-game1")) || 0);
     const intervalRef = useRef<number>(undefined);
+    const buttonValidateRef = useRef<HTMLButtonElement>(null);
+    const timeBeforeNextWord = 5000;
 
     function levelToTime(level?: string) {
         switch (level) {
@@ -48,7 +50,7 @@ const Game1 = ({gameTitle}: Game1Type) => {
     }
 
     function getRandomWord() {
-        return randomWords[Math.floor(Math.random() * randomWords.length)];
+        return wordList[Math.floor(Math.random() * wordList.length)];
     }
 
     function getBoxLetter(text: string, textSize?: number) {
@@ -71,7 +73,7 @@ const Game1 = ({gameTitle}: Game1Type) => {
             setVictoryStatus("En cours");
             setWordSelected("");
             setRandomWord(getRandomWord());
-        }, 5000);
+        }, timeBeforeNextWord);
     }
 
     function checkVictory() {
@@ -88,7 +90,7 @@ const Game1 = ({gameTitle}: Game1Type) => {
         }
     }
 
-    function clickLetter() {
+    function clickValidate() {
         if (victoryStatus === "En cours") {
             clearInterval(intervalRef.current);
 
@@ -120,6 +122,9 @@ const Game1 = ({gameTitle}: Game1Type) => {
     }, [wordSelected]);
 
     useEffect(() => {
+        if (buttonValidateRef.current) {
+            buttonValidateRef.current.focus();
+        }
         intervalRef.current = window.setInterval(() => {
             setCurrentIndexLetter((prevIndex) => (prevIndex + 1) % letters.length);
         }, levelToTime(levelActive));
@@ -128,7 +133,7 @@ const Game1 = ({gameTitle}: Game1Type) => {
     }, [currentIndexLetter, letters, levelActive]);
 
     return (
-        <div className="game1" onKeyDown={e => e.key === "Space" && clickLetter()}>
+        <div className="game1">
             <GameBar barName="header" numGame={1} contents={[
                 gameTitle,
                 score,
@@ -151,14 +156,15 @@ const Game1 = ({gameTitle}: Game1Type) => {
                 </div>
                 {getBoxLetter(wordSelected, randomWord.length)}
                 {victoryStatus !== "En cours" && (
-                    <p style={{color: victoryStatus === "Victoire" ? "gold" : "blueviolet"}}>{victoryStatus}</p>
+                    <p className="victory-status" style={{color: victoryStatus === "Victoire" ? "gold" : "blueviolet"}}>{victoryStatus}</p>
                 )}
             </div>
             <GameBar barName="footer" numGame={1} divDefault={false} contents={[
                 <button
+                    ref={buttonValidateRef}
                     className="button-click-footer game1-footer-0"
-                    onClick={clickLetter}
-                    onKeyDown={e => e.key === "Space" && clickLetter()}
+                    onClick={clickValidate}
+                    onKeyDown={e => e.key === "Space" && clickValidate()}
                     autoFocus>
                     Valider
                 </button>,
@@ -173,7 +179,7 @@ const Game1 = ({gameTitle}: Game1Type) => {
                     Sauvegarder
                 </button>
             ]}/>
-            <ArduinoConnect clickButton={clickLetter} arduinoData={{data: score, dataName: "Score"}}/>
+            <ArduinoConnect clickButton={clickValidate} arduinoData={{data: score, dataName: "Score"}}/>
         </div>
     );
 }
