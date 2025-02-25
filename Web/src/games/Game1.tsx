@@ -3,16 +3,12 @@ import '../styles/Game1.css';
 import crownImage from '../assets/crown.png';
 import LevelSelector from '../components/LevelSelector';
 import GameBar from '../components/GameBar';
-import { lettersInOrder, lettersNotInOrder, wordList } from '../data/data';
+import ArduinoConnect from '../components/ArduinoConnect';
+import { gameNames, lettersInOrder, lettersNotInOrder, wordList } from '../data/data';
 import { useEffect, useRef, useState } from 'react';
 import { VictoryStatus } from '../types/Type';
-import ArduinoConnect from '../components/ArduinoConnect';
 
-type Game1Type = {
-    gameTitle: string,
-}
-
-const Game1 = ({gameTitle}: Game1Type) => {
+const Game1 = () => {
     const [levelActive, setLevelActive] = useState<string>("easy");
     const [letters, setLetters] = useState<string>(lettersInOrder);
     const [randomWord, setRandomWord] = useState<string>(getRandomWord());
@@ -135,7 +131,7 @@ const Game1 = ({gameTitle}: Game1Type) => {
     return (
         <div className="game1">
             <GameBar barName="header" numGame={1} contents={[
-                gameTitle,
+                gameNames[1],
                 score,
                 <>{recordScore}<img className="record-score-image" src={crownImage} alt="crown"/></>
             ]}/>

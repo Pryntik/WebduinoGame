@@ -1,3 +1,8 @@
+export const gameNames = {
+    1: "L'atelier des mots",
+    2: "J'ai déjà vu ce mot ?"
+}
+
 export const lettersInOrder = 'abcdefghijklmnopqrstuvwxyz';
 export const lettersNotInOrder = 'wqblaytxcvzhsmfeukoprnjdgi';
 

@@ -5,14 +5,10 @@ import GameBar from '../components/GameBar';
 import LevelSelector from '../components/LevelSelector';
 import ArduinoConnect from '../components/ArduinoConnect';
 import { ReactElement, useEffect, useRef, useState } from 'react';
-import { wordList } from '../data/data';
+import { gameNames, wordList } from '../data/data';
 import { VictoryStatus } from '../types/Type';
 
-type Game2Type = {
-    gameTitle: string,
-}
-
-const Game2 = ({gameTitle}: Game2Type) => {
+const Game2 = () => {
     const [levelActive, setLevelActive] = useState<string>("easy");
     const [randomWords, setRandomWords] = useState<string[]>([]);
     const [sameWords, setSameWords] = useState<string[]>([]);
@@ -190,7 +186,7 @@ const Game2 = ({gameTitle}: Game2Type) => {
     return (
         <div className="game2">
             <GameBar barName="header" numGame={2} contents={[
-                gameTitle,
+                gameNames[2],
                 score,
                 <>{recordScore}<img className="record-score-image" src={crownImage} alt="crown"/></>
             ]}/>
